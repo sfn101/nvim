@@ -3,9 +3,7 @@ return {
     "neovim/nvim-lspconfig",
     opts = {
       diagnostics = {
-        underline = {
-          severity = { min = 1 },
-        },
+        underline = true,
       },
     },
   },
