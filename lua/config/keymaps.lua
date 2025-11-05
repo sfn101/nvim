@@ -17,17 +17,6 @@ local function toggle_line()
   vim.diagnostic.config({ virtual_lines = virtual_lines_enabled })
 end
 
-local function toggle_all()
-  if virtual_text_enabled == virtual_lines_enabled then
-    virtual_text_enabled = not virtual_text_enabled
-    virtual_lines_enabled = not virtual_lines_enabled
-  else
-    virtual_text_enabled = true
-    virtual_lines_enabled = true
-  end
-  vim.diagnostic.config({ virtual_text = virtual_text_enabled, virtual_lines = virtual_lines_enabled })
-end
-
 local function toggle_focus()
   focus_mode_enabled = not focus_mode_enabled
   if focus_mode_enabled then
@@ -58,6 +47,24 @@ local function toggle_focus()
   end
 end
 
+local function toggle_all()
+  if focus_mode_enabled then
+    toggle_focus()
+    virtual_text_enabled = true
+    virtual_lines_enabled = true
+    vim.diagnostic.config({ virtual_text = true, virtual_lines = true })
+  else
+    if virtual_text_enabled == virtual_lines_enabled then
+      virtual_text_enabled = not virtual_text_enabled
+      virtual_lines_enabled = not virtual_lines_enabled
+    else
+      virtual_text_enabled = true
+      virtual_lines_enabled = true
+    end
+    vim.diagnostic.config({ virtual_text = virtual_text_enabled, virtual_lines = virtual_lines_enabled })
+  end
+end
+
 local wk = require("which-key")
 wk.add({
   { "gl", group = "diagnostics" },
@@ -66,3 +73,6 @@ wk.add({
   { "glt", toggle_text, desc = "Toggle virtual text" },
   { "glf", toggle_focus, desc = "Toggle focus mode (cursor line only)" },
 })
+
+-- Enable focus mode by default
+toggle_focus()
