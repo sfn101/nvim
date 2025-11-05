@@ -5,6 +5,7 @@
 local virtual_text_enabled = true
 local virtual_lines_enabled = true
 local focus_mode_enabled = false
+local focus_ns = vim.api.nvim_create_namespace('diagnostic_focus')
 
 local function toggle_text()
   virtual_text_enabled = not virtual_text_enabled
@@ -39,17 +40,18 @@ local function toggle_focus()
         local bufnr = vim.api.nvim_get_current_buf()
         if not vim.api.nvim_buf_is_loaded(bufnr) then return end
         local line = vim.api.nvim_win_get_cursor(0)[1] - 1
-        vim.diagnostic.hide(bufnr)
+        vim.diagnostic.hide(focus_ns, bufnr)
         local all_diags = vim.diagnostic.get(bufnr)
         local current_diags = vim.tbl_filter(function(d) return d.lnum == line end, all_diags)
-        vim.diagnostic.show(nil, bufnr, current_diags, {
+        vim.diagnostic.show(focus_ns, bufnr, current_diags, {
           virtual_text = virtual_text_enabled,
           virtual_lines = virtual_lines_enabled,
         })
       end,
     })
   else
-    -- Restore global diagnostics
+    -- Hide focus diagnostics and restore global
+    vim.diagnostic.hide(focus_ns)
     vim.diagnostic.config({ virtual_text = virtual_text_enabled, virtual_lines = virtual_lines_enabled })
     -- Remove autocmd
     vim.api.nvim_del_augroup_by_name("diagnostic_focus")
