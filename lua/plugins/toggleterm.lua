@@ -7,7 +7,7 @@ local function cycle_term(direction)
     -- Find all normal terminal ids
     local ids = {}
     for _, buf in ipairs(vim.api.nvim_list_bufs()) do
-      if vim.api.nvim_buf_is_loaded(buf) and vim.api.nvim_buf_get_option(buf, 'filetype') == 'toggleterm' then
+      if vim.api.nvim_buf_is_loaded(buf) and vim.api.nvim_buf_get_option(buf, "filetype") == "toggleterm" then
         local name = vim.api.nvim_buf_get_name(buf)
         local id = name:match("toggleterm#(%d+)")
         if id and id ~= "99" and id ~= "98" then -- exclude float and full
@@ -24,7 +24,8 @@ local function cycle_term(direction)
       end
     end
     if current_index then
-      local next_index = direction == 'next' and ((current_index - 1) % #ids) + 1 or ((current_index - 1 - 1) % #ids) + 1
+      local next_index = direction == "next" and ((current_index - 1) % #ids) + 1
+        or ((current_index - 1 - 1) % #ids) + 1
       local next_id = ids[next_index]
       vim.cmd("ToggleTerm " .. next_id)
     end
@@ -39,29 +40,41 @@ return {
     version = "*",
     config = function()
       require("toggleterm").setup({
-        size = 15,  -- horizontal half window
-        open_mapping = nil,  -- disable default mapping to avoid conflicts
+        size = 15, -- horizontal half window
+        open_mapping = nil, -- disable default mapping to avoid conflicts
         hide_numbers = true,
         shade_terminals = false,
         start_in_insert = true,
-        insert_mappings = false,  -- disable to avoid conflicts
-        terminal_mappings = false,  -- disable to avoid conflicts
+        insert_mappings = false, -- disable to avoid conflicts
+        terminal_mappings = false, -- disable to avoid conflicts
         persist_size = true,
-        direction = 'horizontal',
+        direction = "horizontal",
         close_on_exit = true,
         shell = vim.o.shell,
         float_opts = {
-          border = 'curved',
+          border = "curved",
           winblend = 3,
         },
         on_open = function(term)
           -- Exit terminal mode with ESC
-          vim.api.nvim_buf_set_keymap(term.bufnr, 't', '<Esc>', [[<C-\><C-n>]], {noremap = true})
+          vim.api.nvim_buf_set_keymap(term.bufnr, "t", "<Esc>", [[<C-\><C-n>]], { noremap = true })
           -- Size control mappings
-          vim.api.nvim_buf_set_keymap(term.bufnr, 't', '<leader>j=', [[<C-\><C-n>:resize +5<CR>i]], {noremap = true})
-          vim.api.nvim_buf_set_keymap(term.bufnr, 't', '<leader>j-', [[<C-\><C-n>:resize -5<CR>i]], {noremap = true})
-          vim.api.nvim_buf_set_keymap(term.bufnr, 't', '<leader>j\\', [[<C-\><C-n>:vertical resize +5<CR>i]], {noremap = true})
-          vim.api.nvim_buf_set_keymap(term.bufnr, 't', '<leader>j|', [[<C-\><C-n>:vertical resize -5<CR>i]], {noremap = true})
+          vim.api.nvim_buf_set_keymap(term.bufnr, "t", "<leader>j=", [[<C-\><C-n>:resize +5<CR>i]], { noremap = true })
+          vim.api.nvim_buf_set_keymap(term.bufnr, "t", "<leader>j-", [[<C-\><C-n>:resize -5<CR>i]], { noremap = true })
+          vim.api.nvim_buf_set_keymap(
+            term.bufnr,
+            "t",
+            "<leader>j\\",
+            [[<C-\><C-n>:vertical resize +5<CR>i]],
+            { noremap = true }
+          )
+          vim.api.nvim_buf_set_keymap(
+            term.bufnr,
+            "t",
+            "<leader>j|",
+            [[<C-\><C-n>:vertical resize -5<CR>i]],
+            { noremap = true }
+          )
         end,
       })
     end,

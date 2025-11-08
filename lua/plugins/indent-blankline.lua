@@ -27,10 +27,10 @@ return {
         "RainbowCyan",
       },
       -- Optional: Use a thicker character if you want it more visible
-      -- char = "│", 
+      -- char = "│",
     }
 
     -- 3. (Optional) Disable the current scope highlight if it clashes
-    -- opts.scope = { enabled = false } 
+    -- opts.scope = { enabled = false }
   end,
 }
