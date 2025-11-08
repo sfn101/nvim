@@ -118,81 +118,7 @@ local function new_term()
   term:toggle()
 end
 
--- Toggle (hide/show) all normal terminals
-local function toggle_all_terms()
-  local normal_bufs = {}
-  local any_open = false
-  for _, buf in ipairs(vim.api.nvim_list_bufs()) do
-    if vim.api.nvim_buf_is_loaded(buf) and vim.api.nvim_buf_get_option(buf, 'filetype') == 'toggleterm' then
-      local bufname = vim.api.nvim_buf_get_name(buf)
-      if not (bufname:match("toggleterm#99") or bufname:match("toggleterm#98")) then
-        table.insert(normal_bufs, buf)
-        -- Check if this buf has a window
-        for _, win in ipairs(vim.api.nvim_list_wins()) do
-          if vim.api.nvim_win_get_buf(win) == buf then
-            any_open = true
-            break
-          end
-        end
-      end
-    end
-  end
 
-  if any_open then
-    -- Count windows to close
-    local windows_to_close = 0
-    for _, buf in ipairs(normal_bufs) do
-      for _, win in ipairs(vim.api.nvim_list_wins()) do
-        if vim.api.nvim_win_get_buf(win) == buf then
-          windows_to_close = windows_to_close + 1
-          break
-        end
-      end
-    end
-    -- Hide all by closing windows, but only if it won't close the last window
-    if #vim.api.nvim_list_wins() > windows_to_close then
-      for _, buf in ipairs(normal_bufs) do
-        for _, win in ipairs(vim.api.nvim_list_wins()) do
-          if vim.api.nvim_win_get_buf(win) == buf then
-            vim.api.nvim_win_close(win, false)
-          end
-        end
-      end
-    end
-  elseif #normal_bufs > 0 then
-    -- Show all by opening terminals
-    for _, buf in ipairs(normal_bufs) do
-      local bufname = vim.api.nvim_buf_get_name(buf)
-      local id = bufname:match("toggleterm#(%d+)")
-      if id then
-        vim.cmd("ToggleTerm " .. id)
-      end
-    end
-  else
-    -- Create first terminal
-    local term = Terminal:new()
-    term:toggle()
-  end
-end
-
--- Kill the current terminal if focused on one
-local function kill_current_terminal()
-  if vim.api.nvim_buf_get_option(0, 'filetype') == 'toggleterm' then
-    vim.api.nvim_buf_delete(0, { force = true })
-  end
-end
-
--- Kill all normal terminals
-local function kill_all_terminals()
-  for _, buf in ipairs(vim.api.nvim_list_bufs()) do
-    if vim.api.nvim_buf_is_loaded(buf) and vim.api.nvim_buf_get_option(buf, 'filetype') == 'toggleterm' then
-      local bufname = vim.api.nvim_buf_get_name(buf)
-      if not (bufname:match("toggleterm#99") or bufname:match("toggleterm#98")) then
-        vim.api.nvim_buf_delete(buf, { force = true })
-      end
-    end
-  end
-end
 
 -- Navigation functions
 local prev_term = function() cycle_to_terminal('prev') end
@@ -287,6 +213,8 @@ local function kill_all_special_terminals()
     end
   end
 end
+
+vim.keymap.set('i', 'jj', '<Esc>')
 
 -- Which-key menu setup
 local wk = require("which-key")
