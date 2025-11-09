@@ -2,9 +2,10 @@ return {
   {
     "neovim/nvim-lspconfig",
     opts = {
-      -- Disable LazyVim's diagnostic config - let xray.nvim handle ALL diagnostic display
+      -- Disable LazyVim's virtual text/lines - let xray.nvim handle diagnostic display
+      -- But keep underline enabled for xray to use
       diagnostics = {
-        underline = false,
+        underline = true,
         update_in_insert = false,
         virtual_text = false,
         virtual_lines = false,
