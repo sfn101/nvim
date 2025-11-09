@@ -5,9 +5,10 @@ return {
       diagnostics = {
         underline = true,
       },
-      servers = {
-        biome = {},
-        vtsls = {
+       servers = {
+         lua_ls = {},
+         biome = {},
+         vtsls = {
           settings = {
             javascript = { checkJs = false },
           },
