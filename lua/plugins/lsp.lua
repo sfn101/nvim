@@ -2,8 +2,12 @@ return {
   {
     "neovim/nvim-lspconfig",
     opts = {
+      -- Disable LazyVim's diagnostic config - let xray.nvim handle ALL diagnostic display
       diagnostics = {
-        underline = true,
+        underline = false,
+        update_in_insert = false,
+        virtual_text = false,
+        virtual_lines = false,
       },
        servers = {
          lua_ls = {},
