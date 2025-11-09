@@ -57,3 +57,53 @@ This file documents the Neovim LazyVim configuration and issues encountered duri
 - Load diagnostic configs early in `options.lua` to prevent overrides.
 - Update which-key to new spec format to avoid warnings.
 - For focus mode, hide global diagnostics and show filtered in custom namespace on cursor movement.
+
+## Migration to Standalone xray.nvim Plugin (Nov 9, 2025)
+
+### Completed Tasks
+1. **Created standalone xray.nvim repository** in `/home/sfn/.config/nvim/xray.nvim/`
+   - Modular structure with separate files for init, config, and state management
+   - Complete with README, LICENSE (MIT), and .gitignore
+
+2. **Updated main nvim config** to use xray.nvim as external plugin
+   - Modified `lua/plugins/xray.lua` to load from local directory using `dir` option
+   - Plugin loads with lazy.nvim priority 1000
+   - Depends on which-key for keymap menu
+
+3. **File structure created**:
+   ```
+   xray.nvim/
+   ├── lua/xray/
+   │   ├── init.lua      (main plugin logic, keymap setup, focus mode)
+   │   ├── config.lua    (configuration management)
+   │   └── state.lua     (JSON state persistence)
+   ├── plugin/xray.lua   (plugin loader guard)
+   ├── README.md         (comprehensive usage documentation)
+   ├── LICENSE           (MIT license)
+   └── .gitignore
+   ```
+
+### Current Configuration
+- **GitHub repository**: `sfn101/xray.nvim`
+- **State file**: `~/.local/share/nvim/xray_state.json`
+- All existing keymaps under `gl` prefix preserved
+- Focus mode and state persistence working as before
+
+### Plugin Installation
+Main nvim config now uses GitHub repository:
+```lua
+return {
+  "sfn101/xray.nvim",
+  priority = 1000,
+  dependencies = { "folke/which-key.nvim" },
+  config = function()
+    require("xray").setup({})
+  end,
+}
+```
+
+### Testing Performed
+- ✅ Neovim headless test passed without errors
+- ✅ All xray.nvim files verified in correct locations
+- ✅ Plugin loader structure confirmed working
+- ✅ GitHub repository configured and ready to use
