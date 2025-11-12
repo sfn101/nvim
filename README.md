@@ -6,52 +6,30 @@ This is a customized Neovim configuration based on [LazyVim](https://github.com/
 
 ### Custom Plugins
 
-#### 1. Xray - Diagnostic Management (Custom Plugin)
+#### 1. Tiny Inline Diagnostic - Modern Diagnostic Display
 
-**Repository:** [sfn101/xray.nvim](https://github.com/sfn101/xray.nvim)
+**Repository:** [rachartier/tiny-inline-diagnostic.nvim](https://github.com/rachartier/tiny-inline-diagnostic.nvim)
 
-A custom diagnostic display plugin with persistent state management and flexible display modes. This plugin provides granular control over how LSP diagnostics are displayed in your editor.
+A modern plugin for displaying LSP diagnostics as inline virtual text with customizable styles and icons. Provides clean, unobtrusive diagnostic display without moving code lines.
 
 **Features:**
-- Per-severity visibility control (ERROR, WARN, INFO, HINT)
-- Two display modes: virtual text (inline) or virtual lines (multiline)
-- Focus mode: shows diagnostics only on current cursor line
-- State persistence across sessions
-- Seamless integration with LSP servers
+- Inline diagnostic display (no line shifting like virtual_lines)
+- Customizable presets (modern, classic, minimal, powerline, ghost, simple, nonerdfont, amongus)
+- Multiline diagnostic support for long messages
+- Overflow handling (wrap, none, oneline)
+- Source display (show LSP server names)
+- Related diagnostics support
+- Per-severity filtering and display control
+- Commands: `:TinyInlineDiag enable/disable/toggle`
 
-**Visibility Toggles:**
-- `gla`: Toggle all diagnostics on/off (exits focus mode first if active)
-- `gle`: Toggle ERROR diagnostics on/off
-- `glw`: Toggle WARN/INFO/HINT diagnostics on/off together
+**Commands:**
+- `:TinyInlineDiag enable` - Enable inline diagnostics
+- `:TinyInlineDiag disable` - Disable inline diagnostics
+- `:TinyInlineDiag toggle` - Toggle diagnostics on/off
 
-**Display Mode Toggles:**
-- `glse`: Toggle ERROR display mode (virtual text ↔ virtual lines)
-- `glsw`: Toggle WARN display mode (virtual text ↔ virtual lines)
-- `glsi`: Toggle INFO display mode (virtual text ↔ virtual lines)
-- `glsh`: Toggle HINT display mode (virtual text ↔ virtual lines)
-- `glsc`: Reset all severities to virtual text mode (default)
-
-**Focus Mode:**
-- `glf`: Toggle focus mode (show diagnostics only on current line, respects display settings)
-- `glsf`: Toggle focus mode as default on startup (persisted across sessions)
-
-**Focus Mode Features:**
-- Shows diagnostics only on the current cursor line
-- Updates automatically as you move the cursor
-- Respects current virtual text/lines settings for each severity
-- Respects enabled/disabled state for each severity
-- Any `gls*` command exits focus mode to adjust settings
-
-**State Persistence:**
-- All settings are automatically saved to `~/.local/share/nvim/xray_state.json`
-- Settings persist across Neovim sessions
-- Stores: display modes, enabled states, and focus mode default
-
-**Implementation Details:**
-- Uses custom namespace for focus mode diagnostics
-- Automatic CursorMoved/CursorMovedI autocmd for focus mode updates
-- JSON-based state serialization
-- Early loading in init phase to ensure proper setup
+**API:**
+- `require("tiny-inline-diagnostic").change_severities({severities})` - Filter by severity
+- `require("tiny-inline-diagnostic").enable()` / `disable()` / `toggle()` - Control visibility
 
 #### 2. ToggleTerm - Enhanced Terminal Management
 
@@ -148,20 +126,7 @@ Multi-cursor editing powered by [jake-stewart/multicursor.nvim](https://github.c
 | `<leader>fw` | Normal | Save file |
 | `<leader>fs` | Normal | Save file as (always prompts) |
 
-### Diagnostic Toggles (`gl` prefix)
 
-| Key | Action |
-|-----|--------|
-| `gla` | Toggle all diagnostics on/off |
-| `gle` | Toggle ERROR diagnostics on/off |
-| `glw` | Toggle WARN/INFO/HINT diagnostics on/off |
-| `glf` | Toggle focus mode (current line only) |
-| `glse` | Toggle ERROR display mode (text ↔ lines) |
-| `glsw` | Toggle WARN display mode (text ↔ lines) |
-| `glsi` | Toggle INFO display mode (text ↔ lines) |
-| `glsh` | Toggle HINT display mode (text ↔ lines) |
-| `glsc` | Reset all to virtual text mode |
-| `glsf` | Toggle focus mode as default on startup |
 
 ### Terminal Management (`<leader>j` prefix)
 

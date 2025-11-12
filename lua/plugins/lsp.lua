@@ -2,10 +2,11 @@ return {
   {
     "neovim/nvim-lspconfig",
     opts = {
-       servers = {
-         lua_ls = {},
-         biome = {},
-         vtsls = {
+      diagnostics = { virtual_text = false },
+      servers = {
+        lua_ls = {},
+        biome = {},
+        vtsls = {
           settings = {
             javascript = { checkJs = false },
           },

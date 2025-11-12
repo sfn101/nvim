@@ -17,4 +17,3 @@ vim.g.clipboard = {
 
 -- Ensure the 'unnamedplus' option is set to use the system clipboard
 vim.opt.clipboard = "unnamedplus"
-
