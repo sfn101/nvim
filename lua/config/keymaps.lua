@@ -164,30 +164,30 @@ local function kill_all_terminals()
 end
 
 local function kill_all_special_terminals()
-   -- Close all terminal buffers (normals and special included)
-   for _, buf in ipairs(vim.api.nvim_list_bufs()) do
-     if vim.api.nvim_buf_is_loaded(buf) and vim.api.nvim_buf_get_option(buf, "filetype") == "toggleterm" then
-       vim.api.nvim_buf_delete(buf, { force = true })
-     end
-   end
- end
+  -- Close all terminal buffers (normals and special included)
+  for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+    if vim.api.nvim_buf_is_loaded(buf) and vim.api.nvim_buf_get_option(buf, "filetype") == "toggleterm" then
+      vim.api.nvim_buf_delete(buf, { force = true })
+    end
+  end
+end
 
 -- Diagnostics functions
 local function show_only_errors()
-   require("tiny-inline-diagnostic").change_severities({ vim.diagnostic.severity.ERROR })
+  require("tiny-inline-diagnostic").change_severities({ vim.diagnostic.severity.ERROR })
 end
 
 local function show_only_warnings()
-   require("tiny-inline-diagnostic").change_severities({ vim.diagnostic.severity.WARN })
+  require("tiny-inline-diagnostic").change_severities({ vim.diagnostic.severity.WARN })
 end
 
 local function show_all_diagnostics()
-   require("tiny-inline-diagnostic").change_severities({
-      vim.diagnostic.severity.ERROR,
-      vim.diagnostic.severity.WARN,
-      vim.diagnostic.severity.INFO,
-      vim.diagnostic.severity.HINT,
-   })
+  require("tiny-inline-diagnostic").change_severities({
+    vim.diagnostic.severity.ERROR,
+    vim.diagnostic.severity.WARN,
+    vim.diagnostic.severity.INFO,
+    vim.diagnostic.severity.HINT,
+  })
 end
 
 vim.keymap.set("i", "jj", "<Esc>")
@@ -229,11 +229,11 @@ wk.add({
       save_with_prompt(true)
     end,
     desc = "Save file as",
-   },
+  },
 
-   -- Navigation controls
-   { "[", group = "navigation" },
-   { "[j", prev_term, desc = "Previous terminal" },
-   { "]", group = "navigation" },
-   { "]j", next_term, desc = "Next terminal" },
+  -- Navigation controls
+  { "[", group = "navigation" },
+  { "[j", prev_term, desc = "Previous terminal" },
+  { "]", group = "navigation" },
+  { "]j", next_term, desc = "Next terminal" },
 })

@@ -262,7 +262,9 @@ local function setup_autocmds()
   vim.api.nvim_create_autocmd({ "WinResized" }, {
     group = group,
     callback = function()
-      apply_to_all_windows()
+      vim.defer_fn(function()
+        apply_to_all_windows()
+      end, 10)
     end,
   })
 

@@ -5,7 +5,7 @@ return {
       sources = {
         explorer = {
           layout = {
-            preset = "right",
+            preset = "left",
           },
         },
       },
