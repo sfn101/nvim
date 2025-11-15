@@ -10,5 +10,12 @@ return {
         },
       },
     },
+    terminal = {
+      win = {
+        keys = {
+          term_normal = { "<esc>", "<C-\\><C-n>", mode = "t", desc = "Exit terminal mode" },
+        },
+      },
+    },
   },
 }

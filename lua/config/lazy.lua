@@ -30,7 +30,37 @@ require("lazy").setup({
     version = false, -- always use the latest git commit
     -- version = "*", -- try installing the latest stable version for plugins that support semver
   },
-  install = { colorscheme = { "tokyonight", "habamax", "catppuccin", "kanagawa", "rose-pine", "nightfox", "onedark", "github_dark", "everforest", "vscode", "cyberdream", "onedarkpro", "material", "dracula", "adwaita", "oxocarbon", "solarized-osaka", "sonokai", "nordic", "moonfly", "edge", "tokyodark", "bamboo", "melange", "eldritch", "nightfly", "onenord" } },
+  install = {
+    colorscheme = {
+      "tokyonight",
+      "habamax",
+      "catppuccin",
+      "kanagawa",
+      "rose-pine",
+      "nightfox",
+      "onedark",
+      "github_dark",
+      "everforest",
+      "vscode",
+      "cyberdream",
+      "onedarkpro",
+      "material",
+      "dracula",
+      "adwaita",
+      "oxocarbon",
+      "solarized-osaka",
+      "sonokai",
+      "nordic",
+      "moonfly",
+      "edge",
+      "tokyodark",
+      "bamboo",
+      "melange",
+      "eldritch",
+      "nightfly",
+      "onenord",
+    },
+  },
   checker = {
     enabled = true, -- check for plugin updates periodically
     notify = false, -- notify on update
