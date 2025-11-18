@@ -17,3 +17,12 @@ vim.g.clipboard = {
 
 -- Ensure the 'unnamedplus' option is set to use the system clipboard
 vim.opt.clipboard = "unnamedplus"
+
+-- kulala config options
+vim.filetype.add({
+  extension = {
+    http = "http",
+    rest = "http",
+  },
+})
+
