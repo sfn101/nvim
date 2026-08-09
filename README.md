@@ -7,7 +7,10 @@ A customized Neovim setup based on [LazyVim](https://github.com/LazyVim/LazyVim)
 - **Tiny Inline Diagnostic**: Inline LSP diagnostics without line shifting. Commands: `:TinyInlineDiag toggle`.
 - **Multicursor**: VS Code-style multi-cursor editing with `<C-n>`, `<C-x>`, etc.
 - **Snacks Terminal**: Toggle terminal with `<leader>t`, exits with single `ESC`.
-- Standard LazyVim plugins: CMP, Copilot, LSP, Snacks, Rainbow Delimiters, Indent Blankline.
+- Standard LazyVim plugins: CMP, LSP, Snacks, Rainbow Delimiters, Indent Blankline.
+- **AI tooling**: Claude Code (`<leader>a*`) and Windsurf inline completion (`Tab` to accept).
+
+> 📖 For a full breakdown of every plugin — what it does, its keybindings, and examples — see [`PLUGINS.md`](./PLUGINS.md) or open [`PLUGINS.html`](./PLUGINS.html) in a browser for a styled version.
 
 ## Installation
 

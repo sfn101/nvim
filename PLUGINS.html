@@ -1,0 +1,1082 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Plugin Reference — ~/.config/nvim</title>
+<style>
+  /* ---------- Design tokens ---------- */
+  :root {
+    --bg: #eff1f5;
+    --bg-alt: #e6e9ef;
+    --surface: #ffffff;
+    --surface-2: #f5f6fa;
+    --border: #ccd0da;
+    --border-soft: #dce0e8;
+    --text: #4c4f69;
+    --text-2: #5c5f77;
+    --muted: #8c8fa1;
+
+    --mauve: #8839ef;
+    --green: #40a02b;
+    --blue: #1e66f5;
+    --peach: #fe640b;
+    --red: #d20f39;
+    --teal: #179299;
+    --yellow: #df8e1d;
+    --pink: #ea76cb;
+    --lavender: #7287fd;
+    --sky: #04a5e5;
+
+    --accent: var(--mauve);
+    --shadow: 0 1px 2px rgba(76, 79, 105, 0.06), 0 4px 14px rgba(76, 79, 105, 0.05);
+    --radius: 5px;
+
+    --font-mono: ui-monospace, "JetBrains Mono", "Cascadia Code", "Fira Code", Menlo, Consolas, monospace;
+    --font-serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #1e1e2e;
+      --bg-alt: #181825;
+      --surface: #24273a;
+      --surface-2: #302d41;
+      --border: #45475a;
+      --border-soft: #363a4f;
+      --text: #cdd6f4;
+      --text-2: #bac2de;
+      --muted: #7f849c;
+
+      --mauve: #cba6f7;
+      --green: #a6e3a1;
+      --blue: #89b4fa;
+      --peach: #fab387;
+      --red: #f38ba8;
+      --teal: #94e2d5;
+      --yellow: #f9e2af;
+      --pink: #f5c2e7;
+      --lavender: #b4befe;
+      --sky: #89dceb;
+
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.25), 0 8px 24px rgba(0, 0, 0, 0.35);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #1e1e2e;
+    --bg-alt: #181825;
+    --surface: #24273a;
+    --surface-2: #302d41;
+    --border: #45475a;
+    --border-soft: #363a4f;
+    --text: #cdd6f4;
+    --text-2: #bac2de;
+    --muted: #7f849c;
+
+    --mauve: #cba6f7;
+    --green: #a6e3a1;
+    --blue: #89b4fa;
+    --peach: #fab387;
+    --red: #f38ba8;
+    --teal: #94e2d5;
+    --yellow: #f9e2af;
+    --pink: #f5c2e7;
+    --lavender: #b4befe;
+    --sky: #89dceb;
+
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.25), 0 8px 24px rgba(0, 0, 0, 0.35);
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    * { animation: none !important; transition: none !important; }
+  }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-serif);
+    font-size: 16px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a { color: var(--accent); text-decoration-color: color-mix(in srgb, var(--accent) 40%, transparent); }
+  a:focus-visible, button:focus-visible, input:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  code, kbd, .mono { font-family: var(--font-mono); }
+
+  /* ---------- Title bar ---------- */
+  .titlebar {
+    background: var(--bg-alt);
+    border-bottom: 1px solid var(--border);
+    padding: 0.65rem 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    position: sticky;
+    top: 0;
+    z-index: 30;
+  }
+  .dots { display: flex; gap: 6px; flex-shrink: 0; }
+  .dots span { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+  .dots span:nth-child(1) { background: var(--red); }
+  .dots span:nth-child(2) { background: var(--yellow); }
+  .dots span:nth-child(3) { background: var(--green); }
+  .titlebar .path {
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    color: var(--muted);
+    letter-spacing: 0.02em;
+  }
+
+  /* ---------- Page header ---------- */
+  .hero {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2.75rem 1.5rem 2rem;
+  }
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 0.75rem;
+  }
+  .eyebrow::before { content: "// "; color: var(--accent); }
+  .hero h1 {
+    font-family: var(--font-mono);
+    font-size: clamp(1.7rem, 3.2vw, 2.5rem);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    margin: 0 0 0.9rem;
+    text-wrap: balance;
+    color: var(--text);
+  }
+  .hero p.lede {
+    max-width: 62ch;
+    color: var(--text-2);
+    font-size: 1.05rem;
+    margin: 0 0 1.1rem;
+  }
+  .hero .leader-note {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    color: var(--text-2);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.35rem 0.65rem;
+  }
+  .hero .leader-note kbd { color: var(--accent); }
+
+  /* ---------- Layout ---------- */
+  .layout {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem 4rem;
+    display: grid;
+    grid-template-columns: 240px minmax(0, 1fr);
+    gap: 2.5rem;
+    align-items: start;
+  }
+  @media (max-width: 880px) {
+    .layout { grid-template-columns: 1fr; }
+    .sidebar { position: static !important; order: 2; }
+    main { order: 1; }
+  }
+
+  .sidebar {
+    position: sticky;
+    top: 4.2rem;
+    max-height: calc(100vh - 5rem);
+    overflow-y: auto;
+    padding-right: 0.5rem;
+  }
+  .search {
+    width: 100%;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    padding: 0.55rem 0.7rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    margin-bottom: 1.1rem;
+  }
+  .search::placeholder { color: var(--muted); }
+  .search:focus { border-color: var(--accent); }
+
+  .toc { list-style: none; margin: 0; padding: 0; font-size: 0.86rem; }
+  .toc li { margin: 0; }
+  .toc a {
+    display: block;
+    padding: 0.38rem 0.6rem;
+    border-left: 2px solid transparent;
+    color: var(--text-2);
+    text-decoration: none;
+    border-radius: 0 3px 3px 0;
+  }
+  .toc a:hover { background: var(--surface-2); color: var(--text); }
+  .toc a.active {
+    border-left-color: var(--cat-color, var(--accent));
+    color: var(--text);
+    background: var(--surface-2);
+    font-weight: 600;
+  }
+  .toc .count {
+    float: right;
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+  }
+
+  /* ---------- Sections & cards ---------- */
+  section.category { margin-bottom: 3rem; scroll-margin-top: 4.5rem; }
+  .category-head {
+    display: flex;
+    align-items: baseline;
+    gap: 0.8rem;
+    border-left: 4px solid var(--cat-color, var(--accent));
+    padding-left: 0.9rem;
+    margin-bottom: 0.4rem;
+  }
+  .category-head h2 {
+    font-family: var(--font-mono);
+    font-size: 1.35rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--text);
+  }
+  .category-head .cat-index { font-family: var(--font-mono); font-size: 0.78rem; color: var(--muted); }
+  .category-blurb {
+    padding-left: calc(0.9rem + 4px);
+    color: var(--text-2);
+    font-size: 0.95rem;
+    max-width: 68ch;
+    margin: 0.3rem 0 1.4rem;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius);
+    padding: 1.1rem 1.3rem 1.25rem;
+    margin-bottom: 0.9rem;
+    box-shadow: var(--shadow);
+  }
+  .card-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.55rem;
+    margin-bottom: 0.45rem;
+  }
+  .card-head h3 {
+    font-family: var(--font-mono);
+    font-size: 1.02rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--text);
+  }
+  .repo {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--muted);
+  }
+  .card p { margin: 0.35rem 0; font-size: 0.98rem; color: var(--text); }
+  .card p.desc { color: var(--text-2); }
+  .card ul.features {
+    margin: 0.5rem 0 0.2rem;
+    padding-left: 1.1rem;
+    font-size: 0.93rem;
+    color: var(--text-2);
+  }
+  .card ul.features li { margin: 0.2rem 0; }
+
+  .badge {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 0.14rem 0.4rem;
+    border-radius: 3px;
+    border: 1px solid currentColor;
+  }
+  .badge.default { color: var(--blue); }
+  .badge.custom { color: var(--green); }
+
+  /* ---------- Keybinding tables ---------- */
+  .keys {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 0.7rem;
+    font-size: 0.88rem;
+  }
+  .keys th {
+    text-align: left;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+    padding: 0.3rem 0.5rem;
+  }
+  .keys td {
+    padding: 0.4rem 0.5rem;
+    border-bottom: 1px solid var(--border-soft);
+    vertical-align: top;
+    color: var(--text-2);
+  }
+  .keys tr:last-child td { border-bottom: none; }
+  .keys td.action { color: var(--text); }
+  .keys-wrap { overflow-x: auto; }
+
+  kbd {
+    display: inline-block;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-bottom-width: 2px;
+    border-radius: 4px;
+    padding: 0.1rem 0.4rem;
+    font-size: 0.8rem;
+    color: var(--text);
+    white-space: nowrap;
+  }
+  .mode-tag {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    color: var(--muted);
+    background: var(--bg-alt);
+    border-radius: 3px;
+    padding: 0.05rem 0.3rem;
+  }
+
+  /* ---------- Theme table (color list) ---------- */
+  .theme-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: 0.7rem;
+  }
+  .theme-chip {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: var(--surface);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius);
+    padding: 0.55rem 0.75rem;
+  }
+  .theme-chip .swatch { width: 14px; height: 14px; border-radius: 3px; flex-shrink: 0; border: 1px solid rgba(0,0,0,0.15); }
+  .theme-chip .name { font-family: var(--font-mono); font-size: 0.85rem; font-weight: 600; }
+  .theme-chip .style { font-size: 0.8rem; color: var(--muted); }
+  .theme-chip.active { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+
+  /* Lutos special bar swatch */
+  .lutos-bar {
+    display: flex;
+    height: 10px;
+    border-radius: 3px;
+    overflow: hidden;
+    margin: 0.7rem 0 1rem;
+    width: 220px;
+  }
+  .lutos-bar span { flex: 1; }
+
+  footer {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1.5rem 1.5rem 3rem;
+    color: var(--muted);
+    font-size: 0.82rem;
+    font-family: var(--font-mono);
+    border-top: 1px solid var(--border-soft);
+  }
+
+  ::selection { background: color-mix(in srgb, var(--accent) 35%, transparent); }
+</style>
+</head>
+<body>
+
+  <div class="titlebar">
+    <div class="dots"><span></span><span></span><span></span></div>
+    <div class="path">~/.config/nvim/PLUGINS.html</div>
+  </div>
+
+  <header class="hero">
+    <p class="eyebrow">nvim config reference</p>
+    <h1>Every plugin, what it does, and how to drive it</h1>
+    <p class="lede">A complete map of this LazyVim setup — 85 plugins across 17 groups, each with its purpose, an example, and its real keybindings pulled live from a running install.</p>
+    <span class="leader-note">Leader key is <kbd>space</kbd> — so <kbd>&lt;leader&gt;ff</kbd> means <kbd>space</kbd> then <kbd>f</kbd> <kbd>f</kbd>. <span class="badge default" style="margin-left:0.4rem;">default</span> = built-in · <span class="badge custom">custom</span> = written for this config</span>
+  </header>
+
+  <div class="layout">
+    <nav class="sidebar" aria-label="Table of contents">
+      <input class="search" id="search" type="text" placeholder="Filter plugins…" autocomplete="off" />
+      <ul class="toc" id="toc">
+        <li><a href="#core" data-cat="core">Core Framework <span class="count">4</span></a></li>
+        <li><a href="#ai" data-cat="ai">AI Assistants <span class="count">2</span></a></li>
+        <li><a href="#completion" data-cat="completion">Completion &amp; Snippets <span class="count">10</span></a></li>
+        <li><a href="#lsp" data-cat="lsp">LSP, Diagnostics &amp; Tooling <span class="count">7</span></a></li>
+        <li><a href="#format" data-cat="format">Formatting &amp; Linting <span class="count">2</span></a></li>
+        <li><a href="#syntax" data-cat="syntax">Syntax &amp; Treesitter <span class="count">7</span></a></li>
+        <li><a href="#editing" data-cat="editing">Editing Power-Tools <span class="count">7</span></a></li>
+        <li><a href="#nav" data-cat="nav">Navigation, Search &amp; Sessions <span class="count">2</span></a></li>
+        <li><a href="#ui" data-cat="ui">UI &amp; Notifications <span class="count">9</span></a></li>
+        <li><a href="#markdown" data-cat="markdown">Markdown Tools <span class="count">2</span></a></li>
+        <li><a href="#git" data-cat="git">Git <span class="count">1</span></a></li>
+        <li><a href="#db" data-cat="db">Database Tools <span class="count">3</span></a></li>
+        <li><a href="#rest" data-cat="rest">REST / API Client <span class="count">1</span></a></li>
+        <li><a href="#python" data-cat="python">Python Tooling <span class="count">1</span></a></li>
+        <li><a href="#lutos" data-cat="lutos">Custom — lutos.nvim <span class="count">1</span></a></li>
+        <li><a href="#themes" data-cat="themes">Color Themes <span class="count">26</span></a></li>
+        <li><a href="#custom-keys" data-cat="custom-keys">Custom Keybindings</a></li>
+      </ul>
+    </nav>
+
+    <main>
+
+      <!-- ============ CORE ============ -->
+      <section class="category" id="core" style="--cat-color: var(--mauve)">
+        <div class="category-head"><span class="cat-index mono">01</span><h2>Core Framework</h2></div>
+        <p class="category-blurb">The plumbing everything else runs on. No interaction — they just work in the background.</p>
+
+        <article class="card" data-name="lazy.nvim">
+          <div class="card-head"><h3>lazy.nvim</h3><span class="repo">folke/lazy.nvim</span></div>
+          <p class="desc">The plugin manager itself. Installs, lazy-loads (only starts a plugin once its command/keymap/filetype/event actually fires), and updates every plugin in this document. Open it with <kbd>:Lazy</kbd>.</p>
+        </article>
+
+        <article class="card" data-name="LazyVim">
+          <div class="card-head"><h3>LazyVim</h3><span class="repo">LazyVim/LazyVim</span></div>
+          <p class="desc">The starter-kit distribution this whole config is built on top of. Ships sane default options, keymaps, and a curated plugin set — every file in <code>lua/plugins/</code> overrides or extends it.</p>
+        </article>
+
+        <article class="card" data-name="plenary.nvim">
+          <div class="card-head"><h3>plenary.nvim</h3><span class="repo">nvim-lua/plenary.nvim</span></div>
+          <p class="desc">A shared Lua standard library — async jobs, path handling, test helpers — that dozens of other plugins depend on internally. You never call it directly.</p>
+        </article>
+
+        <article class="card" data-name="nui.nvim">
+          <div class="card-head"><h3>nui.nvim</h3><span class="repo">MunifTanjim/nui.nvim</span></div>
+          <p class="desc">A UI component toolkit (popups, inputs, menus, layouts) that <code>noice.nvim</code> and others use internally to draw their floating windows.</p>
+        </article>
+      </section>
+
+      <!-- ============ AI ============ -->
+      <section class="category" id="ai" style="--cat-color: var(--blue)">
+        <div class="category-head"><span class="cat-index mono">02</span><h2>AI Assistants</h2></div>
+
+        <article class="card" data-name="claudecode.nvim">
+          <div class="card-head"><h3>claudecode.nvim</h3><span class="repo">coder/claudecode.nvim</span></div>
+          <p class="desc">Embeds Claude Code directly inside Neovim as a terminal-based coding assistant. <em>Example:</em> select a messy function in visual mode, <kbd>&lt;leader&gt;as</kbd> to send it to Claude with a question, then review its diff and accept or reject it without leaving the editor.</p>
+          <div class="keys-wrap">
+          <table class="keys">
+            <tr><th>Key</th><th>Mode</th><th>Action</th></tr>
+            <tr><td><kbd>&lt;leader&gt;ac</kbd></td><td><span class="mode-tag">n</span></td><td class="action">Toggle panel <span class="badge default">default</span></td></tr>
+            <tr><td><kbd>&lt;leader&gt;af</kbd></td><td><span class="mode-tag">n</span></td><td class="action">Focus panel <span class="badge default">default</span></td></tr>
+            <tr><td><kbd>&lt;leader&gt;ar</kbd></td><td><span class="mode-tag">n</span></td><td class="action">Resume last session <span class="badge default">default</span></td></tr>
+            <tr><td><kbd>&lt;leader&gt;aC</kbd></td><td><span class="mode-tag">n</span></td><td class="action">Continue previous conversation <span class="badge default">default</span></td></tr>
+            <tr><td><kbd>&lt;leader&gt;ab</kbd></td><td><span class="mode-tag">n</span></td><td class="action">Add current buffer as context <span class="badge default">default</span></td></tr>
+            <tr><td><kbd>&lt;leader&gt;as</kbd></td><td><span class="mode-tag">v</span></td><td class="action">Send selection to Claude <span class="badge default">default</span></td></tr>
+            <tr><td><kbd>&lt;leader&gt;as</kbd></td><td><span class="mode-tag">n · file tree</span></td><td class="action">Add file under cursor as context <span class="badge default">default</span></td></tr>
+            <tr><td><kbd>&lt;leader&gt;aa</kbd></td><td><span class="mode-tag">n</span></td><td class="action">Accept proposed diff <span class="badge default">default</span></td></tr>
+            <tr><td><kbd>&lt;leader&gt;ad</kbd></td><td><span class="mode-tag">n</span></td><td class="action">Deny proposed diff <span class="badge default">default</span></td></tr>
+          </table>
+          </div>
+        </article>
+
+        <article class="card" data-name="windsurf.vim codeium">
+          <div class="card-head"><h3>windsurf.vim</h3><span class="repo">Exafunction/windsurf.vim</span></div>
+          <p class="desc">Inline AI autocomplete — formerly Codeium, same company, rebranded as Windsurf. <em>Example:</em> start typing a function signature and it suggests the full implementation as grey ghost text; <kbd>Tab</kbd> accepts it. First run <kbd>:Codeium Auth</kbd> once to log in.</p>
+          <div class="keys-wrap">
+          <table class="keys">
+            <tr><th>Key</th><th>Action</th></tr>
+            <tr><td><kbd>Tab</kbd></td><td class="action">Accept suggestion <span class="badge default">default</span></td></tr>
+            <tr><td><kbd>M-]</kbd> / <kbd>M-[</kbd></td><td class="action">Next / previous suggestion <span class="badge default">default</span></td></tr>
+            <tr><td><kbd>C-]</kbd></td><td class="action">Clear/dismiss suggestion <span class="badge default">default</span></td></tr>
+            <tr><td><kbd>C-k</kbd> / <kbd>C-l</kbd></td><td class="action">Accept next word / next line <span class="badge default">default</span></td></tr>
+            <tr><td><kbd>M-\</kbd></td><td class="action">Manually trigger a suggestion <span class="badge default">default</span></td></tr>
+          </table>
+          </div>
+        </article>
+      </section>
+
+      <!-- ============ COMPLETION ============ -->
+      <section class="category" id="completion" style="--cat-color: var(--green)">
+        <div class="category-head"><span class="cat-index mono">03</span><h2>Completion &amp; Snippets</h2></div>
+
+        <article class="card" data-name="nvim-cmp">
+          <div class="card-head"><h3>nvim-cmp</h3><span class="repo">hrsh7th/nvim-cmp</span></div>
+          <p class="desc">The autocompletion engine behind the popup menu while typing. It aggregates suggestions from every source below into one ranked list.</p>
+        </article>
+        <article class="card" data-name="cmp-nvim-lsp">
+          <div class="card-head"><h3>cmp-nvim-lsp</h3><span class="repo">hrsh7th/cmp-nvim-lsp</span></div>
+          <p class="desc">Feeds LSP-provided completions — functions, variables, types from your language server — into nvim-cmp.</p>
+        </article>
+        <article class="card" data-name="cmp-buffer">
+          <div class="card-head"><h3>cmp-buffer</h3><span class="repo">hrsh7th/cmp-buffer</span></div>
+          <p class="desc">Suggests words already present in open buffers — handy for plain text or repeated identifiers.</p>
+        </article>
+        <article class="card" data-name="cmp-path">
+          <div class="card-head"><h3>cmp-path</h3><span class="repo">hrsh7th/cmp-path</span></div>
+          <p class="desc">Suggests filesystem paths when typing something like <code>./</code> or <code>/</code>.</p>
+        </article>
+        <article class="card" data-name="cmp-mini-snippets mini.snippets">
+          <div class="card-head"><h3>cmp-mini-snippets</h3><span class="repo">abeldekat/cmp-mini-snippets</span></div>
+          <p class="desc">Bridges <code>mini.snippets</code> into nvim-cmp so snippet expansion shows up in the same completion menu.</p>
+        </article>
+        <article class="card" data-name="mini.snippets">
+          <div class="card-head"><h3>mini.snippets</h3><span class="repo">nvim-mini/mini.snippets</span></div>
+          <p class="desc">Manages and expands code snippets. <em>Example:</em> type <code>for</code> and expand it into a full for-loop skeleton with tab-stops.</p>
+        </article>
+        <article class="card" data-name="friendly-snippets">
+          <div class="card-head"><h3>friendly-snippets</h3><span class="repo">rafamadriz/friendly-snippets</span></div>
+          <p class="desc">A large, community-maintained snippet collection for dozens of languages, consumed by mini.snippets so useful snippets exist without writing your own.</p>
+        </article>
+        <article class="card" data-name="mini.pairs">
+          <div class="card-head"><h3>mini.pairs</h3><span class="repo">nvim-mini/mini.pairs</span></div>
+          <p class="desc">Auto-closes and auto-deletes bracket/quote pairs as you type — type <code>(</code> and <code>)</code> appears automatically; backspace removes both.</p>
+        </article>
+        <article class="card" data-name="lazydev.nvim">
+          <div class="card-head"><h3>lazydev.nvim</h3><span class="repo">folke/lazydev.nvim</span></div>
+          <p class="desc">Makes the Lua language server understand the Neovim API (<code>vim.*</code>) when editing this very config, so <code>vim.keymap.set</code> and friends get accurate completion and hover docs.</p>
+        </article>
+        <article class="card" data-name="tailwindcss-colorizer-cmp.nvim">
+          <div class="card-head"><h3>tailwindcss-colorizer-cmp.nvim</h3><span class="repo">roobert/tailwindcss-colorizer-cmp.nvim</span></div>
+          <p class="desc">Adds a small color swatch next to Tailwind CSS class completions — <code>bg-red-500</code> shows an actual red square before you pick it.</p>
+        </article>
+
+        <article class="card" data-name="cmp mapping tab">
+          <div class="card-head"><h3>Completion keymaps</h3><span class="repo">lua/plugins/cmp.lua</span></div>
+          <p class="desc">Custom mapping layer on top of the defaults above.</p>
+          <div class="keys-wrap">
+          <table class="keys">
+            <tr><th>Key</th><th>Action</th></tr>
+            <tr><td><kbd>Tab</kbd></td><td class="action">Menu open → next item. Menu closed → snippet-forward, then falls through to windsurf.vim's accept <span class="badge custom">custom</span></td></tr>
+            <tr><td><kbd>S-Tab</kbd></td><td class="action">Previous item <span class="badge custom">custom</span></td></tr>
+            <tr><td><kbd>CR</kbd></td><td class="action">Confirm selection <span class="badge custom">custom</span></td></tr>
+            <tr><td><kbd>S-CR</kbd></td><td class="action">Confirm and replace word <span class="badge custom">custom</span></td></tr>
+            <tr><td><kbd>C-Space</kbd></td><td class="action">Trigger completion manually <span class="badge custom">custom</span></td></tr>
+            <tr><td><kbd>C-n</kbd> / <kbd>C-p</kbd></td><td class="action">Next / previous item <span class="badge custom">custom</span></td></tr>
+            <tr><td><kbd>C-b</kbd> / <kbd>C-f</kbd></td><td class="action">Scroll docs window <span class="badge custom">custom</span></td></tr>
+            <tr><td><kbd>C-e</kbd></td><td class="action">Abort completion <span class="badge custom">custom</span></td></tr>
+            <tr><td><kbd>Esc</kbd></td><td class="action">Abort if menu open, else normal escape <span class="badge custom">custom</span></td></tr>
+          </table>
+          </div>
+        </article>
+      </section>
+
+      <!-- ============ LSP ============ -->
+      <section class="category" id="lsp" style="--cat-color: var(--peach)">
+        <div class="category-head"><span class="cat-index mono">04</span><h2>LSP, Diagnostics &amp; Tooling</h2></div>
+
+        <article class="card" data-name="nvim-lspconfig">
+          <div class="card-head"><h3>nvim-lspconfig</h3><span class="repo">neovim/nvim-lspconfig</span></div>
+          <p class="desc">Quickstart configs connecting Neovim's built-in LSP client to language servers — this config wires up <code>lua_ls</code>, <code>biome</code>, and <code>vtsls</code> (tweaked so it doesn't duplicate JS diagnostics). Powers go-to-definition, hover docs, and inline errors.</p>
+        </article>
+        <article class="card" data-name="mason.nvim">
+          <div class="card-head"><h3>mason.nvim</h3><span class="repo">mason-org/mason.nvim</span></div>
+          <p class="desc">A package manager for LSP servers, linters, formatters, and debuggers, installable from inside Neovim. <em>Example:</em> <kbd>:Mason</kbd>, browse, <kbd>i</kbd> to install a new language server.</p>
+        </article>
+        <article class="card" data-name="mason-lspconfig.nvim">
+          <div class="card-head"><h3>mason-lspconfig.nvim</h3><span class="repo">mason-org/mason-lspconfig.nvim</span></div>
+          <p class="desc">Glue between Mason and nvim-lspconfig so servers installed via Mason are automatically registered.</p>
+        </article>
+        <article class="card" data-name="tiny-inline-diagnostic.nvim">
+          <div class="card-head"><h3>tiny-inline-diagnostic.nvim</h3><span class="repo">rachartier/tiny-inline-diagnostic.nvim</span></div>
+          <p class="desc">Replaces Neovim's default virtual-text diagnostics with a compact inline display that doesn't shift code around. Command: <kbd>:TinyInlineDiag toggle</kbd>.</p>
+        </article>
+        <article class="card" data-name="inc-rename.nvim">
+          <div class="card-head"><h3>inc-rename.nvim</h3><span class="repo">smjonas/inc-rename.nvim</span></div>
+          <p class="desc">Shows a live preview of an LSP rename across the buffer as you type the new name, instead of renaming blind. Wired to the default <kbd>grn</kbd>.</p>
+        </article>
+        <article class="card" data-name="fidget.nvim">
+          <div class="card-head"><h3>fidget.nvim</h3><span class="repo">j-hui/fidget.nvim</span></div>
+          <p class="desc">A small, non-intrusive corner notification for LSP progress ("Loading workspace…", "Formatting…") so long-running work doesn't feel silent.</p>
+        </article>
+        <article class="card" data-name="SchemaStore.nvim">
+          <div class="card-head"><h3>SchemaStore.nvim</h3><span class="repo">b0o/SchemaStore.nvim</span></div>
+          <p class="desc">Supplies the JSON/YAML servers with a huge catalog of known schemas (package.json, tsconfig.json, GitHub Actions) for autocomplete and validation in config files.</p>
+        </article>
+
+        <article class="card" data-name="lsp keymaps">
+          <div class="card-head"><h3>LSP keymaps</h3></div>
+          <div class="keys-wrap">
+          <table class="keys">
+            <tr><th>Key</th><th>Action</th></tr>
+            <tr><td><kbd>gd</kbd></td><td class="action">Go to definition <span class="badge default">default</span></td></tr>
+            <tr><td><kbd>gri</kbd></td><td class="action">Go to implementation <span class="badge default">default</span></td></tr>
+            <tr><td><kbd>grr</kbd></td><td class="action">Go to references <span class="badge default">default</span></td></tr>
+            <tr><td><kbd>grn</kbd></td><td class="action">Rename symbol (live preview) <span class="badge default">default</span></td></tr>
+            <tr><td><kbd>gra</kbd></td><td class="action">Code actions <span class="badge default">default</span></td></tr>
+            <tr><td><kbd>grt</kbd></td><td class="action">Go to type definition <span class="badge default">default</span></td></tr>
+            <tr><td><kbd>grx</kbd></td><td class="action">Run codelens <span class="badge default">default</span></td></tr>
+            <tr><td><kbd>gO</kbd></td><td class="action">Document symbols <span class="badge default">default</span></td></tr>
+            <tr><td><kbd>C-w d</kbd></td><td class="action">Show diagnostic under cursor <span class="badge default">default</span></td></tr>
+            <tr><td><kbd>[d</kbd> / <kbd>]d</kbd></td><td class="action">Previous / next diagnostic <span class="badge default">default</span></td></tr>
+            <tr><td><kbd>&lt;leader&gt;cm</kbd></td><td class="action">Open Mason <span class="badge default">default</span></td></tr>
+          </table>
+          </div>
+        </article>
+      </section>
+
+      <!-- ============ FORMAT ============ -->
+      <section class="category" id="format" style="--cat-color: var(--teal)">
+        <div class="category-head"><span class="cat-index mono">05</span><h2>Formatting &amp; Linting</h2></div>
+
+        <article class="card" data-name="conform.nvim">
+          <div class="card-head"><h3>conform.nvim</h3><span class="repo">stevearc/conform.nvim</span></div>
+          <p class="desc">Runs code formatters (prettier, stylua, biome…) on save or on demand, lightweight and predictable. <em>Example:</em> save a <code>.lua</code> file and it's auto-formatted with stylua.</p>
+        </article>
+        <article class="card" data-name="nvim-lint">
+          <div class="card-head"><h3>nvim-lint</h3><span class="repo">mfussenegger/nvim-lint</span></div>
+          <p class="desc">Runs external linters asynchronously and surfaces their output as diagnostics, complementing whatever the LSP server already catches.</p>
+          <div class="keys-wrap">
+          <table class="keys">
+            <tr><th>Key</th><th>Mode</th><th>Action</th></tr>
+            <tr><td><kbd>&lt;leader&gt;cF</kbd></td><td><span class="mode-tag">n/v</span></td><td class="action">Format injected languages (e.g. a JS block inside Markdown) <span class="badge default">default</span></td></tr>
+          </table>
+          </div>
+        </article>
+      </section>
+
+      <!-- ============ SYNTAX ============ -->
+      <section class="category" id="syntax" style="--cat-color: var(--pink)">
+        <div class="category-head"><span class="cat-index mono">06</span><h2>Syntax &amp; Treesitter</h2></div>
+
+        <article class="card" data-name="nvim-treesitter">
+          <div class="card-head"><h3>nvim-treesitter</h3><span class="repo">nvim-treesitter/nvim-treesitter</span></div>
+          <p class="desc">Parses code into a real syntax tree instead of regex highlighting — the foundation for accurate highlighting, indentation, and every "syntax aware" feature below.</p>
+        </article>
+        <article class="card" data-name="nvim-treesitter-textobjects">
+          <div class="card-head"><h3>nvim-treesitter-textobjects</h3><span class="repo">nvim-treesitter/nvim-treesitter-textobjects</span></div>
+          <p class="desc">Syntax-aware text objects and motions: select/move/swap function arguments, bodies, and class blocks based on the real parse tree.</p>
+        </article>
+        <article class="card" data-name="nvim-ts-autotag">
+          <div class="card-head"><h3>nvim-ts-autotag</h3><span class="repo">windwp/nvim-ts-autotag</span></div>
+          <p class="desc">Auto-closes and auto-renames matching HTML/JSX/Vue tags — edit <code>&lt;div&gt;</code> to <code>&lt;section&gt;</code> and the closing tag renames itself.</p>
+        </article>
+        <article class="card" data-name="nvim-ts-context-commentstring">
+          <div class="card-head"><h3>nvim-ts-context-commentstring</h3><span class="repo">JoosepAlviste/nvim-ts-context-commentstring</span></div>
+          <p class="desc">Detects the correct comment syntax based on cursor position inside mixed-language files — commenting JS inside a <code>&lt;script&gt;</code> block in <code>.html</code> uses <code>//</code>, not <code>&lt;!-- --&gt;</code>.</p>
+        </article>
+        <article class="card" data-name="rainbow-delimiters.nvim">
+          <div class="card-head"><h3>rainbow-delimiters.nvim</h3><span class="repo">HiPhish/rainbow-delimiters.nvim</span></div>
+          <p class="desc">Colors matching brackets in a repeating rainbow sequence so nested code is easier to visually track.</p>
+        </article>
+        <article class="card" data-name="indent-blankline.nvim">
+          <div class="card-head"><h3>indent-blankline.nvim</h3><span class="repo">lukas-reineke/indent-blankline.nvim</span></div>
+          <p class="desc">Draws vertical indent guide lines — recolored here into a custom 7-color rainbow palette to match the bracket colors above.</p>
+        </article>
+        <article class="card" data-name="mini.ai">
+          <div class="card-head"><h3>mini.ai</h3><span class="repo">nvim-mini/mini.ai</span></div>
+          <p class="desc">Extends the built-in <kbd>a</kbd>/<kbd>i</kbd> text objects (<code>daw</code>, <code>ci"</code>) and adds new ones for functions and arguments.</p>
+        </article>
+
+        <article class="card" data-name="treesitter keymaps">
+          <div class="card-head"><h3>Treesitter keymaps</h3></div>
+          <div class="keys-wrap">
+          <table class="keys">
+            <tr><th>Key</th><th>Mode</th><th>Action</th></tr>
+            <tr><td><kbd>C-space</kbd></td><td><span class="mode-tag">n/v</span></td><td class="action">Start/expand incremental selection <span class="badge default">default</span></td></tr>
+            <tr><td><kbd>an</kbd> / <kbd>in</kbd></td><td><span class="mode-tag">v</span></td><td class="action">Select outer/inner node <span class="badge default">default</span></td></tr>
+            <tr><td><kbd>[n</kbd> / <kbd>]n</kbd></td><td><span class="mode-tag">n/v</span></td><td class="action">Previous / next node <span class="badge default">default</span></td></tr>
+            <tr><td><kbd>[N</kbd> / <kbd>]N</kbd></td><td><span class="mode-tag">v</span></td><td class="action">Previous / next sibling node <span class="badge default">default</span></td></tr>
+          </table>
+          </div>
+        </article>
+      </section>
+
+      <!-- ============ EDITING ============ -->
+      <section class="category" id="editing" style="--cat-color: var(--yellow)">
+        <div class="category-head"><span class="cat-index mono">07</span><h2>Editing Power-Tools</h2></div>
+
+        <article class="card" data-name="mini.comment">
+          <div class="card-head"><h3>mini.comment</h3><span class="repo">nvim-mini/mini.comment</span></div>
+          <p class="desc">Fast line/block commenting, aware of the current filetype's syntax (and mixed-language files via nvim-ts-context-commentstring). Replaces LazyVim's default <code>ts-comments.nvim</code> in this config — running both fought over the same keys.</p>
+        </article>
+        <article class="card" data-name="mini.surround">
+          <div class="card-head"><h3>mini.surround</h3><span class="repo">nvim-mini/mini.surround</span></div>
+          <p class="desc">Add, delete, replace, or find surrounding characters like quotes, brackets, or tags. <em>Example:</em> cursor inside <code>"hello"</code>, <kbd>gsd"</kbd> deletes the surrounding quotes → <code>hello</code>.</p>
+        </article>
+        <article class="card" data-name="multicursor.nvim">
+          <div class="card-head"><h3>multicursor.nvim</h3><span class="repo">jake-stewart/multicursor.nvim</span></div>
+          <p class="desc">VS Code-style multiple cursors. <em>Example:</em> cursor on a variable, <kbd>C-n</kbd> repeatedly to select every occurrence, then type to edit them all at once.</p>
+        </article>
+        <article class="card" data-name="flash.nvim">
+          <div class="card-head"><h3>flash.nvim</h3><span class="repo">folke/flash.nvim</span></div>
+          <p class="desc">Jump anywhere on screen by typing a couple of characters and picking a highlighted label — faster than repeated <code>f</code>/<code>w</code> motions.</p>
+        </article>
+        <article class="card" data-name="quicker.nvim">
+          <div class="card-head"><h3>quicker.nvim</h3><span class="repo">stevearc/quicker.nvim</span></div>
+          <p class="desc">Improves the quickfix window: syntax highlighting on results, and expandable surrounding context per match.</p>
+        </article>
+        <article class="card" data-name="grug-far.nvim">
+          <div class="card-head"><h3>grug-far.nvim</h3><span class="repo">MagicDuck/grug-far.nvim</span></div>
+          <p class="desc">A project-wide find-and-replace UI with live preview, instead of piecing together <code>:%s</code> across files.</p>
+        </article>
+        <article class="card" data-name="todo-comments.nvim">
+          <div class="card-head"><h3>todo-comments.nvim</h3><span class="repo">folke/todo-comments.nvim</span></div>
+          <p class="desc">Highlights <code>TODO</code>, <code>FIXME</code>, <code>HACK</code>, <code>NOTE</code> comments in distinct colors and lets you list/search them project-wide.</p>
+        </article>
+
+        <article class="card" data-name="editing keymaps">
+          <div class="card-head"><h3>Editing keymaps</h3></div>
+          <div class="keys-wrap">
+          <table class="keys">
+            <tr><th>Key</th><th>Mode</th><th>Action</th></tr>
+            <tr><td><kbd>gc</kbd> / <kbd>gcc</kbd></td><td><span class="mode-tag">n/v</span></td><td class="action">Toggle comment <span class="badge default">default</span></td></tr>
+            <tr><td><kbd>gsa</kbd></td><td><span class="mode-tag">n/v</span></td><td class="action">Add surrounding <span class="badge default">default</span> — remapped from mini.surround's usual <kbd>ys</kbd>/<kbd>sa</kbd> to avoid clashing with flash's <kbd>s</kbd></td></tr>
+            <tr><td><kbd>gsd</kbd></td><td><span class="mode-tag">n</span></td><td class="action">Delete surrounding <span class="badge default">default</span></td></tr>
+            <tr><td><kbd>gsr</kbd></td><td><span class="mode-tag">n</span></td><td class="action">Replace surrounding <span class="badge default">default</span></td></tr>
+            <tr><td><kbd>gsf</kbd> / <kbd>gsF</kbd></td><td><span class="mode-tag">n</span></td><td class="action">Find surrounding (right/left) <span class="badge default">default</span></td></tr>
+            <tr><td><kbd>C-n</kbd></td><td><span class="mode-tag">n/v</span></td><td class="action">Add cursor at next match <span class="badge custom">custom</span></td></tr>
+            <tr><td><kbd>C-x</kbd></td><td><span class="mode-tag">n/v</span></td><td class="action">Skip match, advance to next <span class="badge custom">custom</span></td></tr>
+            <tr><td><kbd>C-Up</kbd> / <kbd>C-Down</kbd></td><td><span class="mode-tag">n/v</span></td><td class="action">Add cursor above/below <span class="badge custom">custom</span></td></tr>
+            <tr><td><kbd>C-LeftMouse</kbd></td><td><span class="mode-tag">n</span></td><td class="action">Add cursor at click <span class="badge custom">custom</span></td></tr>
+            <tr><td><kbd>Esc</kbd></td><td><span class="mode-tag">n</span></td><td class="action">Clear all extra cursors <span class="badge custom">custom</span></td></tr>
+            <tr><td><kbd>s</kbd> / <kbd>S</kbd></td><td><span class="mode-tag">n/v</span></td><td class="action">Flash jump / Flash Treesitter jump <span class="badge default">default</span></td></tr>
+            <tr><td><kbd>&lt;leader&gt;sr</kbd></td><td><span class="mode-tag">n/v</span></td><td class="action">Search and replace (grug-far) <span class="badge default">default</span></td></tr>
+            <tr><td><kbd>&lt;leader&gt;st</kbd></td><td><span class="mode-tag">n</span></td><td class="action">Search todos <span class="badge default">default</span></td></tr>
+            <tr><td><kbd>&gt;</kbd> / <kbd>&lt;</kbd></td><td><span class="mode-tag">n · quickfix</span></td><td class="action">Expand / collapse context around a result <span class="badge custom">custom</span></td></tr>
+          </table>
+          </div>
+        </article>
+      </section>
+
+      <!-- ============ NAV ============ -->
+      <section class="category" id="nav" style="--cat-color: var(--lavender)">
+        <div class="category-head"><span class="cat-index mono">08</span><h2>Navigation, Search &amp; Sessions</h2></div>
+
+        <article class="card" data-name="snacks.nvim">
+          <div class="card-head"><h3>snacks.nvim</h3><span class="repo">folke/snacks.nvim</span></div>
+          <p class="desc">A bundle of quality-of-life modules in one plugin: fuzzy file/text picker, file explorer, floating terminal, dashboard, and more. This config opens the explorer on the left and makes its terminal exit with a single <kbd>Esc</kbd>. <em>Example:</em> <kbd>&lt;leader&gt;ff</kbd> opens a fuzzy file finder.</p>
+        </article>
+        <article class="card" data-name="persistence.nvim">
+          <div class="card-head"><h3>persistence.nvim</h3><span class="repo">folke/persistence.nvim</span></div>
+          <p class="desc">Saves your window/buffer layout per project directory and restores it — reopening a project brings back the same files and splits.</p>
+        </article>
+
+        <article class="card" data-name="nav keymaps">
+          <div class="card-head"><h3>Navigation keymaps</h3></div>
+          <div class="keys-wrap">
+          <table class="keys">
+            <tr><th>Key</th><th>Action</th></tr>
+            <tr><td><kbd>&lt;leader&gt;ff</kbd></td><td class="action">Find files (root dir) <span class="badge default">default</span></td></tr>
+            <tr><td><kbd>&lt;leader&gt;fF</kbd></td><td class="action">Find files (cwd) <span class="badge default">default</span></td></tr>
+            <tr><td><kbd>&lt;leader&gt;fg</kbd></td><td class="action">Find git-tracked files <span class="badge default">default</span></td></tr>
+            <tr><td><kbd>&lt;leader&gt;fr</kbd> / <kbd>&lt;leader&gt;fR</kbd></td><td class="action">Recent files <span class="badge default">default</span></td></tr>
+            <tr><td><kbd>&lt;leader&gt;fb</kbd> / <kbd>&lt;leader&gt;fB</kbd></td><td class="action">List buffers <span class="badge default">default</span></td></tr>
+            <tr><td><kbd>&lt;leader&gt;e</kbd> / <kbd>&lt;leader&gt;E</kbd></td><td class="action">File explorer (root / cwd) <span class="badge default">default</span></td></tr>
+            <tr><td><kbd>&lt;leader&gt;t</kbd></td><td class="action">Toggle floating terminal <span class="badge custom">custom</span>, exits with one <kbd>Esc</kbd> <span class="badge custom">custom</span></td></tr>
+            <tr><td><kbd>&lt;leader&gt;sg</kbd> / <kbd>&lt;leader&gt;/</kbd></td><td class="action">Live grep (root dir) <span class="badge default">default</span></td></tr>
+            <tr><td><kbd>&lt;leader&gt;sw</kbd></td><td class="action">Grep word under cursor <span class="badge default">default</span></td></tr>
+            <tr><td><kbd>&lt;leader&gt;gs</kbd> / <kbd>&lt;leader&gt;gd</kbd></td><td class="action">Git status / diff pickers <span class="badge default">default</span></td></tr>
+            <tr><td><kbd>&lt;leader&gt;qs</kbd> / <kbd>&lt;leader&gt;ql</kbd></td><td class="action">Restore session / restore last <span class="badge default">default</span></td></tr>
+          </table>
+          </div>
+        </article>
+      </section>
+
+      <!-- ============ UI ============ -->
+      <section class="category" id="ui" style="--cat-color: var(--mauve)">
+        <div class="category-head"><span class="cat-index mono">09</span><h2>UI &amp; Notifications</h2></div>
+
+        <article class="card" data-name="bufferline.nvim">
+          <div class="card-head"><h3>bufferline.nvim</h3><span class="repo">akinsho/bufferline.nvim</span></div>
+          <p class="desc">Draws the tab-like row of open buffers at the top of the window — click between open files like browser tabs.</p>
+        </article>
+        <article class="card" data-name="lualine.nvim">
+          <div class="card-head"><h3>lualine.nvim</h3><span class="repo">nvim-lualine/lualine.nvim</span></div>
+          <p class="desc">The statusline at the bottom: mode, git branch, diagnostics count, filetype, cursor position.</p>
+        </article>
+        <article class="card" data-name="noice.nvim">
+          <div class="card-head"><h3>noice.nvim</h3><span class="repo">folke/noice.nvim</span></div>
+          <p class="desc">Replaces the plain command line and message area with a nicer floating UI — command line as a popup, search gets a virtual counter, LSP hover docs get a clean border.</p>
+        </article>
+        <article class="card" data-name="which-key.nvim">
+          <div class="card-head"><h3>which-key.nvim</h3><span class="repo">folke/which-key.nvim</span></div>
+          <p class="desc">Shows a popup of available keybindings whenever you pause mid-combo — press <kbd>&lt;leader&gt;</kbd> and wait, a menu of everything under it appears. Also how the custom <code>&lt;leader&gt;f</code> and <code>&lt;leader&gt;t</code> groups in this config are labeled.</p>
+        </article>
+        <article class="card" data-name="trouble.nvim">
+          <div class="card-head"><h3>trouble.nvim</h3><span class="repo">folke/trouble.nvim</span></div>
+          <p class="desc">A dedicated, prettified list view for diagnostics, LSP references, quickfix, and todos — easier to scan than the built-in quickfix window.</p>
+        </article>
+        <article class="card" data-name="mini.animate">
+          <div class="card-head"><h3>mini.animate</h3><span class="repo">nvim-mini/mini.animate</span></div>
+          <p class="desc">Smooth animations for common actions — cursor movement, window resize, scrolling.</p>
+        </article>
+        <article class="card" data-name="mini.indentscope">
+          <div class="card-head"><h3>mini.indentscope</h3><span class="repo">nvim-mini/mini.indentscope</span></div>
+          <p class="desc">Highlights and animates the indent scope the cursor is currently inside — a vertical line that "grows" to show the current block.</p>
+        </article>
+        <article class="card" data-name="mini.hipatterns">
+          <div class="card-head"><h3>mini.hipatterns</h3><span class="repo">nvim-mini/mini.hipatterns</span></div>
+          <p class="desc">Highlights specific text patterns inline — a hex color code like <code>#e06c75</code> gets a live color swatch beside it.</p>
+        </article>
+        <article class="card" data-name="mini.icons">
+          <div class="card-head"><h3>mini.icons</h3><span class="repo">nvim-mini/mini.icons</span></div>
+          <p class="desc">Consistent filetype/kind icons used throughout the UI — file explorer, statusline, completion menu.</p>
+        </article>
+
+        <article class="card" data-name="ui keymaps">
+          <div class="card-head"><h3>UI keymaps</h3></div>
+          <div class="keys-wrap">
+          <table class="keys">
+            <tr><th>Key</th><th>Action</th></tr>
+            <tr><td><kbd>&lt;leader&gt;un</kbd></td><td class="action">Dismiss all notifications <span class="badge default">default</span></td></tr>
+            <tr><td><kbd>&lt;leader&gt;sn</kbd></td><td class="action">Noice submenu (history, last message, dismiss) <span class="badge default">default</span></td></tr>
+            <tr><td><kbd>&lt;leader&gt;xx</kbd> / <kbd>&lt;leader&gt;xX</kbd></td><td class="action">Diagnostics / buffer diagnostics (Trouble) <span class="badge default">default</span></td></tr>
+            <tr><td><kbd>&lt;leader&gt;cs</kbd> / <kbd>&lt;leader&gt;cS</kbd></td><td class="action">Symbols / LSP references (Trouble) <span class="badge default">default</span></td></tr>
+            <tr><td><kbd>H</kbd> / <kbd>L</kbd></td><td class="action">Previous / next buffer <span class="badge default">default</span></td></tr>
+            <tr><td><kbd>&lt;leader&gt;bp</kbd></td><td class="action">Pin buffer <span class="badge default">default</span></td></tr>
+          </table>
+          </div>
+        </article>
+      </section>
+
+      <!-- ============ MARKDOWN ============ -->
+      <section class="category" id="markdown" style="--cat-color: var(--blue)">
+        <div class="category-head"><span class="cat-index mono">10</span><h2>Markdown Tools</h2></div>
+
+        <article class="card" data-name="render-markdown.nvim">
+          <div class="card-head"><h3>render-markdown.nvim</h3><span class="repo">MeanderingProgrammer/render-markdown.nvim</span></div>
+          <p class="desc">Renders Markdown inline while editing — headers get styled, checkboxes become real glyphs, code blocks get a border — no preview window needed.</p>
+        </article>
+        <article class="card" data-name="markdown-preview.nvim">
+          <div class="card-head"><h3>markdown-preview.nvim</h3><span class="repo">iamcco/markdown-preview.nvim</span></div>
+          <p class="desc">Opens a live-updating preview of the current file in your actual browser, for full CSS-rendered fidelity render-markdown.nvim can't do inline.</p>
+          <div class="keys-wrap">
+          <table class="keys">
+            <tr><th>Key</th><th>Action</th></tr>
+            <tr><td><kbd>&lt;leader&gt;cp</kbd></td><td class="action">Toggle preview in browser <span class="badge default">default</span></td></tr>
+          </table>
+          </div>
+        </article>
+      </section>
+
+      <!-- ============ GIT ============ -->
+      <section class="category" id="git" style="--cat-color: var(--green)">
+        <div class="category-head"><span class="cat-index mono">11</span><h2>Git</h2></div>
+
+        <article class="card" data-name="gitsigns.nvim">
+          <div class="card-head"><h3>gitsigns.nvim</h3><span class="repo">lewis6991/gitsigns.nvim</span></div>
+          <p class="desc">Shows a colored sign in the gutter for added/changed/deleted lines vs. the last commit, and lets you stage, reset, preview, or blame individual hunks without leaving the buffer.</p>
+          <div class="keys-wrap">
+          <table class="keys">
+            <tr><th>Key</th><th>Mode</th><th>Action</th></tr>
+            <tr><td><kbd>]h</kbd> / <kbd>[h</kbd></td><td><span class="mode-tag">n</span></td><td class="action">Next / previous hunk <span class="badge default">default</span></td></tr>
+            <tr><td><kbd>]H</kbd> / <kbd>[H</kbd></td><td><span class="mode-tag">n</span></td><td class="action">Last / first hunk <span class="badge default">default</span></td></tr>
+            <tr><td><kbd>&lt;leader&gt;ghs</kbd> / <kbd>&lt;leader&gt;ghr</kbd></td><td><span class="mode-tag">n/v</span></td><td class="action">Stage / reset hunk <span class="badge default">default</span></td></tr>
+            <tr><td><kbd>&lt;leader&gt;ghS</kbd> / <kbd>&lt;leader&gt;ghR</kbd></td><td><span class="mode-tag">n</span></td><td class="action">Stage / reset entire buffer <span class="badge default">default</span></td></tr>
+            <tr><td><kbd>&lt;leader&gt;ghp</kbd></td><td><span class="mode-tag">n</span></td><td class="action">Preview hunk inline <span class="badge default">default</span></td></tr>
+            <tr><td><kbd>&lt;leader&gt;ghb</kbd> / <kbd>&lt;leader&gt;ghB</kbd></td><td><span class="mode-tag">n</span></td><td class="action">Blame line / blame buffer <span class="badge default">default</span></td></tr>
+            <tr><td><kbd>&lt;leader&gt;ghd</kbd> / <kbd>&lt;leader&gt;ghD</kbd></td><td><span class="mode-tag">n</span></td><td class="action">Diff this / diff against <code>~</code> <span class="badge default">default</span></td></tr>
+            <tr><td><kbd>ih</kbd></td><td><span class="mode-tag">o/v</span></td><td class="action">Text object: current hunk <span class="badge default">default</span></td></tr>
+            <tr><td><kbd>&lt;leader&gt;uG</kbd></td><td><span class="mode-tag">n</span></td><td class="action">Toggle git signs on/off <span class="badge default">default</span></td></tr>
+          </table>
+          </div>
+        </article>
+      </section>
+
+      <!-- ============ DB ============ -->
+      <section class="category" id="db" style="--cat-color: var(--peach)">
+        <div class="category-head"><span class="cat-index mono">12</span><h2>Database Tools</h2></div>
+
+        <article class="card" data-name="vim-dadbod">
+          <div class="card-head"><h3>vim-dadbod</h3><span class="repo">tpope/vim-dadbod</span></div>
+          <p class="desc">The underlying database connection engine — connects to Postgres, MySQL, SQLite and more, and runs queries against them.</p>
+        </article>
+        <article class="card" data-name="vim-dadbod-ui">
+          <div class="card-head"><h3>vim-dadbod-ui</h3><span class="repo">kristijanhusak/vim-dadbod-ui</span></div>
+          <p class="desc">A visual UI on top of vim-dadbod: browse connections, tables, and schemas, and run queries from a side panel.</p>
+          <div class="keys-wrap">
+          <table class="keys">
+            <tr><th>Key</th><th>Action</th></tr>
+            <tr><td><kbd>D</kbd></td><td class="action">Toggle the database UI <span class="badge default">default</span></td></tr>
+          </table>
+          </div>
+        </article>
+        <article class="card" data-name="vim-dadbod-completion">
+          <div class="card-head"><h3>vim-dadbod-completion</h3><span class="repo">kristijanhusak/vim-dadbod-completion</span></div>
+          <p class="desc">Autocompletes table and column names in <code>.sql</code> buffers based on the connected database's actual schema.</p>
+        </article>
+      </section>
+
+      <!-- ============ REST ============ -->
+      <section class="category" id="rest" style="--cat-color: var(--teal)">
+        <div class="category-head"><span class="cat-index mono">13</span><h2>REST / API Client</h2></div>
+
+        <article class="card" data-name="kulala.nvim">
+          <div class="card-head"><h3>kulala.nvim</h3><span class="repo">mistweaverco/kulala.nvim</span></div>
+          <p class="desc">A full HTTP/GraphQL/gRPC/WebSocket client inside Neovim — like Postman, but as <code>.http</code> files you write and run with a keypress. <em>Example:</em> write <code>GET https://api.example.com/users</code> in a <code>.http</code> file, hit <kbd>&lt;leader&gt;Rr</kbd>, see the JSON response in a split.</p>
+          <div class="keys-wrap">
+          <table class="keys">
+            <tr><th>Key</th><th>Action</th></tr>
+            <tr><td><kbd>&lt;leader&gt;Rr</kbd></td><td class="action">Run/replay the request under cursor <span class="badge default">default</span></td></tr>
+            <tr><td><kbd>&lt;leader&gt;Rb</kbd></td><td class="action">Open scratchpad for ad-hoc requests <span class="badge default">default</span></td></tr>
+            <tr><td><kbd>&lt;leader&gt;R</kbd></td><td class="action">Full Rest menu <span class="badge default">default</span></td></tr>
+          </table>
+          </div>
+        </article>
+      </section>
+
+      <!-- ============ PYTHON ============ -->
+      <section class="category" id="python" style="--cat-color: var(--pink)">
+        <div class="category-head"><span class="cat-index mono">14</span><h2>Python Tooling</h2></div>
+
+        <article class="card" data-name="venv-selector.nvim">
+          <div class="card-head"><h3>venv-selector.nvim</h3><span class="repo">linux-cultist/venv-selector.nvim</span></div>
+          <p class="desc">Lets you pick which Python virtual environment the LSP and terminal should use, auto-detecting <code>venv</code>/<code>.venv</code>/conda environments on disk.</p>
+          <div class="keys-wrap">
+          <table class="keys">
+            <tr><th>Key</th><th>Action</th></tr>
+            <tr><td><kbd>&lt;leader&gt;cv</kbd></td><td class="action">Open venv selector <span class="badge default">default</span></td></tr>
+          </table>
+          </div>
+        </article>
+      </section>
+
+      <!-- ============ LUTOS ============ -->
+      <section class="category" id="lutos" style="--cat-color: var(--yellow)">
+        <div class="category-head"><span class="cat-index mono">15</span><h2>Custom Plugin — lutos.nvim</h2></div>
+        <p class="category-blurb">Your own plugin, inspired by VS Code's "Peacock" extension.</p>
+
+        <article class="card" data-name="lutos.nvim">
+          <div class="card-head"><h3>lutos.nvim</h3><span class="repo">sfn101/lutos.nvim</span></div>
+          <div class="lutos-bar" aria-hidden="true">
+            <span style="background:var(--blue)"></span><span style="background:var(--green)"></span><span style="background:var(--yellow)"></span><span style="background:var(--peach)"></span><span style="background:var(--pink)"></span><span style="background:var(--mauve)"></span>
+          </div>
+          <p class="desc"><strong>What it does:</strong> paints a colored vertical bar down the left edge of the editor window so you can tell different projects/workspaces apart at a glance when several Neovim windows or tmux panes are open side by side. <em>Example:</em> color your <code>api</code> repo blue and your <code>frontend</code> repo green, so a stray keystroke in the wrong window is obvious before you even read the file path.</p>
+          <p class="desc"><strong>How it works:</strong> a hybrid renderer — it wraps your existing statuscolumn for the buffer content area (so diagnostics/git/fold signs stay untouched), plus a shared floating window for empty space below the last line, so the bar always covers the full window height. The chosen color is saved per-directory in <code>~/.local/share/nvim/lutos_state.json</code> and restored automatically next time you open that project.</p>
+          <ul class="features">
+            <li>18 preset colors, including VS Code Peacock's framework-branded picks ("React Blue", "Vue Green")</li>
+            <li>Per-workspace persistence — set once, remembered forever for that directory</li>
+            <li>Updates live as you scroll, resize, or edit</li>
+            <li>Doesn't interfere with existing sign-column content</li>
+          </ul>
+          <div class="keys-wrap">
+          <table class="keys">
+            <tr><th>Key</th><th>Action</th></tr>
+            <tr><td><kbd>&lt;leader&gt;wp</kbd></td><td class="action">Open the color picker to paint the current workspace <span class="badge default">default</span></td></tr>
+          </table>
+          </div>
+        </article>
+      </section>
+
+      <!-- ============ THEMES ============ -->
+      <section class="category" id="themes" style="--cat-color: var(--lavender)">
+        <div class="category-head"><span class="cat-index mono">16</span><h2>Color Themes</h2></div>
+        <p class="category-blurb">Pure visual palettes — no interaction needed. <strong>catppuccin is the active default</strong> (set in <code>lua/plugins/colorscheme.lua</code>). Switch anytime with <kbd>&lt;leader&gt;uC</kbd>.</p>
+
+        <div class="theme-grid">
+          <div class="theme-chip active" data-name="catppuccin"><span class="swatch" style="background:#8839ef"></span><span class="name">catppuccin</span><span class="style">active · pastel</span></div>
+          <div class="theme-chip" data-name="tokyonight"><span class="swatch" style="background:#7aa2f7"></span><span class="name">tokyonight</span><span class="style">clean dark</span></div>
+          <div class="theme-chip" data-name="kanagawa"><span class="swatch" style="background:#7e9cd8"></span><span class="name">kanagawa</span><span class="style">Hokusai-inspired</span></div>
+          <div class="theme-chip" data-name="rose-pine neovim"><span class="swatch" style="background:#eb6f92"></span><span class="name">rose-pine</span><span class="style">muted, warm</span></div>
+          <div class="theme-chip" data-name="nightfox"><span class="swatch" style="background:#e0af68"></span><span class="name">nightfox</span><span class="style">customizable variants</span></div>
+          <div class="theme-chip" data-name="onedark"><span class="swatch" style="background:#61afef"></span><span class="name">onedark</span><span class="style">Atom classic, 5 variants</span></div>
+          <div class="theme-chip" data-name="github-nvim-theme"><span class="swatch" style="background:#79c0ff"></span><span class="name">github-nvim-theme</span><span class="style">GitHub's editor look</span></div>
+          <div class="theme-chip" data-name="everforest"><span class="swatch" style="background:#a7c080"></span><span class="name">everforest</span><span class="style">low-contrast green</span></div>
+          <div class="theme-chip" data-name="vscode.nvim"><span class="swatch" style="background:#569cd6"></span><span class="name">vscode</span><span class="style">Dark+/Light+ clone</span></div>
+          <div class="theme-chip" data-name="cyberdream"><span class="swatch" style="background:#00d9e9"></span><span class="name">cyberdream</span><span class="style">high-contrast futuristic</span></div>
+          <div class="theme-chip" data-name="onedarkpro"><span class="swatch" style="background:#c678dd"></span><span class="name">onedarkpro</span><span class="style">semantic tokens</span></div>
+          <div class="theme-chip" data-name="material"><span class="swatch" style="background:#89ddff"></span><span class="name">material</span><span class="style">Google Material</span></div>
+          <div class="theme-chip" data-name="dracula"><span class="swatch" style="background:#bd93f9"></span><span class="name">dracula</span><span class="style">classic purple/dark</span></div>
+          <div class="theme-chip" data-name="adwaita"><span class="swatch" style="background:#3584e4"></span><span class="name">adwaita</span><span class="style">GNOME-inspired</span></div>
+          <div class="theme-chip" data-name="oxocarbon"><span class="swatch" style="background:#ee5396"></span><span class="name">oxocarbon</span><span class="style">IBM Carbon, in Fennel</span></div>
+          <div class="theme-chip" data-name="solarized-osaka"><span class="swatch" style="background:#2aa198"></span><span class="name">solarized-osaka</span><span class="style">dark solarized</span></div>
+          <div class="theme-chip" data-name="sonokai"><span class="swatch" style="background:#9ed072"></span><span class="name">sonokai</span><span class="style">high-contrast Monokai Pro</span></div>
+          <div class="theme-chip" data-name="nordic"><span class="swatch" style="background:#5e81ac"></span><span class="name">nordic</span><span class="style">warmer, darker Nord</span></div>
+          <div class="theme-chip" data-name="vim-moonfly-colors"><span class="swatch" style="background:#80a0ff"></span><span class="name">moonfly</span><span class="style">dark charcoal</span></div>
+          <div class="theme-chip" data-name="edge"><span class="swatch" style="background:#41a7fc"></span><span class="name">edge</span><span class="style">Atom One / Material</span></div>
+          <div class="theme-chip" data-name="tokyodark"><span class="swatch" style="background:#7199ee"></span><span class="name">tokyodark</span><span class="style">minimal dark</span></div>
+          <div class="theme-chip" data-name="bamboo"><span class="swatch" style="background:#79a854"></span><span class="name">bamboo</span><span class="style">warm green</span></div>
+          <div class="theme-chip" data-name="melange-nvim"><span class="swatch" style="background:#d47766"></span><span class="name">melange</span><span class="style">warm muted tones</span></div>
+          <div class="theme-chip" data-name="eldritch"><span class="swatch" style="background:#818cf3"></span><span class="name">eldritch</span><span class="style">purple-toned dark</span></div>
+          <div class="theme-chip" data-name="vim-nightfly-colors"><span class="swatch" style="background:#719cd6"></span><span class="name">nightfly</span><span class="style">dark midnight blue</span></div>
+          <div class="theme-chip" data-name="onenord"><span class="swatch" style="background:#88c0d0"></span><span class="name">onenord</span><span class="style">Nord + One Dark hybrid</span></div>
+        </div>
+      </section>
+
+      <!-- ============ CUSTOM KEYS ============ -->
+      <section class="category" id="custom-keys" style="--cat-color: var(--mauve)">
+        <div class="category-head"><span class="cat-index mono">17</span><h2>Custom Keybindings Cheatsheet</h2></div>
+        <p class="category-blurb">Everything below was hand-written for this config — not a plugin or LazyVim default. The things worth remembering because they're yours.</p>
+
+        <article class="card" data-name="custom keybindings cheatsheet">
+          <div class="keys-wrap">
+          <table class="keys">
+            <tr><th>Key</th><th>Mode</th><th>Action</th><th>Where</th></tr>
+            <tr><td><kbd>jj</kbd></td><td><span class="mode-tag">insert</span></td><td class="action">Exit to normal mode</td><td><code>keymaps.lua</code></td></tr>
+            <tr><td><kbd>C-s</kbd></td><td><span class="mode-tag">i/x/n/s</span></td><td class="action">Save; prompts for a name if unnamed</td><td><code>keymaps.lua</code></td></tr>
+            <tr><td><kbd>&lt;leader&gt;fw</kbd></td><td><span class="mode-tag">n</span></td><td class="action">Save file</td><td><code>keymaps.lua</code></td></tr>
+            <tr><td><kbd>&lt;leader&gt;fs</kbd></td><td><span class="mode-tag">n</span></td><td class="action">Save file, always prompting for a name</td><td><code>keymaps.lua</code></td></tr>
+            <tr><td><kbd>&lt;leader&gt;t</kbd></td><td><span class="mode-tag">n</span></td><td class="action">Toggle floating terminal (Snacks)</td><td><code>keymaps.lua</code></td></tr>
+            <tr><td><kbd>Esc</kbd></td><td><span class="mode-tag">terminal</span></td><td class="action">Exit terminal mode in one press</td><td><code>snacks.lua</code></td></tr>
+            <tr><td><kbd>C-n</kbd> / <kbd>C-x</kbd></td><td><span class="mode-tag">n/v</span></td><td class="action">Multicursor add / skip-and-advance</td><td><code>multicursor.lua</code></td></tr>
+            <tr><td><kbd>C-Up</kbd> / <kbd>C-Down</kbd></td><td><span class="mode-tag">n/v</span></td><td class="action">Multicursor add above/below</td><td><code>multicursor.lua</code></td></tr>
+            <tr><td><kbd>C-LeftMouse</kbd></td><td><span class="mode-tag">n</span></td><td class="action">Multicursor add at click</td><td><code>multicursor.lua</code></td></tr>
+            <tr><td><kbd>Tab</kbd></td><td><span class="mode-tag">insert · cmp</span></td><td class="action">Select-next when menu open, else AI-accept chain</td><td><code>cmp.lua</code></td></tr>
+            <tr><td><kbd>&gt;</kbd> / <kbd>&lt;</kbd></td><td><span class="mode-tag">n · quickfix</span></td><td class="action">Expand/collapse context per result</td><td><code>quicker.lua</code></td></tr>
+          </table>
+          </div>
+        </article>
+      </section>
+
+    </main>
+  </div>
+
+  <footer>Generated to reflect the live plugin list and active keymaps captured directly from this Neovim install. See <code>PLUGINS.md</code> for the plain-text version.</footer>
+
+<script>
+(function () {
+  var search = document.getElementById('search');
+  var cards = Array.prototype.slice.call(document.querySelectorAll('.card[data-name]'));
+  var sections = Array.prototype.slice.call(document.querySelectorAll('section.category'));
+
+  search.addEventListener('input', function () {
+    var q = search.value.trim().toLowerCase();
+    cards.forEach(function (card) {
+      var hay = (card.dataset.name + ' ' + card.textContent).toLowerCase();
+      card.style.display = q === '' || hay.indexOf(q) !== -1 ? '' : 'none';
+    });
+    sections.forEach(function (sec) {
+      var visible = sec.querySelectorAll('.card[data-name]:not([style*="display: none"])').length;
+      var totalCards = sec.querySelectorAll('.card[data-name]').length;
+      sec.style.display = (q === '' || totalCards === 0 || visible > 0) ? '' : 'none';
+    });
+  });
+
+  var links = Array.prototype.slice.call(document.querySelectorAll('.toc a'));
+  var map = {};
+  links.forEach(function (a) { map[a.getAttribute('href').slice(1)] = a; });
+
+  if ('IntersectionObserver' in window) {
+    var obs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        var link = map[entry.target.id];
+        if (!link) return;
+        if (entry.isIntersecting) {
+          links.forEach(function (l) { l.classList.remove('active'); });
+          link.classList.add('active');
+        }
+      });
+    }, { rootMargin: '-15% 0px -75% 0px' });
+    sections.forEach(function (sec) { obs.observe(sec); });
+  }
+})();
+</script>
+</body>
+</html>

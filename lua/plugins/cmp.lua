@@ -28,7 +28,7 @@ return {
           if cmp.visible() then
             cmp.select_next_item({ behavior = cmp.SelectBehavior.Insert })
           else
-            fallback()
+            return LazyVim.cmp.map({ "snippet_forward", "ai_nes", "ai_accept" }, fallback)()
           end
         end,
         ["<S-Tab>"] = function(fallback)

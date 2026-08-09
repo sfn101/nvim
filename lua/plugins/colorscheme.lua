@@ -11,7 +11,7 @@ return {
   { "marko-cerovac/material.nvim", lazy = true },
   { "Mofiqul/dracula.nvim", lazy = true },
   { "Mofiqul/adwaita.nvim", lazy = true },
-  { "nyoom-engineering/oxocarbon.nvim", lazy = true },
+  { "nyoom-engineering/oxocarbon.nvim", lazy = true, build = false },
   { "craftzdog/solarized-osaka.nvim", lazy = true },
   { "sainnhe/sonokai", lazy = true },
   { "AlexvZyl/nordic.nvim", lazy = true },
